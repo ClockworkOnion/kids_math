@@ -5,10 +5,17 @@ using TMPro;
 
 public class TextElement : MonoBehaviour
 {
+    private string currentText;
 
     private float letterOffset = 20f;
 
+    public string GetText() {
+        if (currentText == null) return "";
+        return currentText;
+    }
+
     public void SetText(string toPrint) {
+        currentText = toPrint;
         int index = 0;
         foreach (char c in toPrint)
         {

@@ -8,7 +8,7 @@ public class MainMenu : MonoBehaviour
 {
 
     public int menuItemOffset = 80;
-    string[] gameModes = { "Addition", "Find the largest" };
+    string[] gameModes = { "Addition Level 1", "Addition Level 2", "Addition Level 3" };
     List<GameObject> menuTextObjects = new List<GameObject>();
 
     private void Awake()
@@ -38,18 +38,25 @@ public class MainMenu : MonoBehaviour
     {
         bool pressedOne = Input.GetKeyDown("1");
         bool pressedTwo = Input.GetKeyDown("2");
+        bool pressedThree = Input.GetKeyDown("3");
+        //bool pressedFour = Input.GetKeyDown("4");
 
         if (pressedOne)
         {
-            GameManager.GetInstance().SetGameMode(StageManager.GameMode.equationLvl1);
+            GameManager.GetInstance().SetGameMode(StageManager.GameMode.addLv1);
             SceneManager.LoadScene("EasyModeScene");
         }
 
         if (pressedTwo)
         {
-            GameManager.GetInstance().SetGameMode(StageManager.GameMode.findBiggest);
+            GameManager.GetInstance().SetGameMode(StageManager.GameMode.addLv2);
             SceneManager.LoadScene("EasyModeScene");
         }
 
+        if (pressedThree)
+        {
+            GameManager.GetInstance().SetGameMode(StageManager.GameMode.addLv3);
+            SceneManager.LoadScene("EasyModeScene");
+        }
     }
 }
