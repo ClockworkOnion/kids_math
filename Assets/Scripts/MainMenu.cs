@@ -8,8 +8,10 @@ public class MainMenu : MonoBehaviour
 {
 
     public int menuItemOffset = 80;
+    public TMP_FontAsset menuFont;
     string[] gameModes = { "Addition Level 1", "Addition Level 2", "Addition Level 3" };
     List<GameObject> menuTextObjects = new List<GameObject>();
+    private Camera mainCamera;
 
     private void Awake()
     {
@@ -22,6 +24,8 @@ public class MainMenu : MonoBehaviour
             textObject.transform.SetParent(transform, false);
             TextMeshProUGUI textComponent = textObject.AddComponent<TextMeshProUGUI>();
             textComponent.SetText((index + 1).ToString() + ". " + mode);
+            if (menuFont) textComponent.font = menuFont;
+            textComponent.color = new Color32(245, 245, 121, 255);
 
             // Set the position
             RectTransform rect = textObject.GetComponent<RectTransform>();
@@ -32,6 +36,12 @@ public class MainMenu : MonoBehaviour
 
             index++;
         }
+    }
+
+    private void Start()
+    {
+        mainCamera = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<Camera>();
+        CameraWobbleUp();
     }
 
     void Update()
@@ -59,4 +69,13 @@ public class MainMenu : MonoBehaviour
             SceneManager.LoadScene("EasyModeScene");
         }
     }
+
+    private void CameraWobbleUp() {
+        LeanTween.move(mainCamera.gameObject, mainCamera.transform.position + Vector3.up * 2, 30).setEaseInOutSine().setOnComplete(CameraWobbleDown);
+    }
+
+    private void CameraWobbleDown() { 
+        LeanTween.move(mainCamera.gameObject, mainCamera.transform.position + Vector3.up * -2, 30).setEaseInOutSine().setOnComplete(CameraWobbleUp);
+    }
+
 }

@@ -21,8 +21,6 @@ public class CarAnimation : MonoBehaviour
 
     private StageManager stageManager;
 
-
-
     private void Awake()
     {
         parent = GameObject.Find("PlayerCar").GetComponent<Transform>();
@@ -30,13 +28,11 @@ public class CarAnimation : MonoBehaviour
         particleRight = GameObject.Find("ParticleRight").GetComponent<ParticleSystem>();
     }
 
-    // Start is called before the first frame update
     void Start()
     {
         stageManager = GameObject.Find("StageManager").GetComponent<StageManager>();
     }
 
-    // Update is called once per frame
     void Update()
     {
         drivingSpeed = stageManager.getDriveSpeed() / 7;
@@ -46,16 +42,12 @@ public class CarAnimation : MonoBehaviour
         Vector3 rotationAngles = new Vector3(0, 180 + xDiff, 0);
         transform.rotation = Quaternion.Euler(rotationAngles);
         prevX = transform.position.x;
-
     }
 
     private void FixedUpdate()
     {
         rotateTires();
         jitterFrame();
-
-
-
     }
 
     private void rotateTires()
@@ -76,7 +68,7 @@ public class CarAnimation : MonoBehaviour
 
     public void smokeBurst()
     {
-            particleLeft.Play();
-            particleRight.Play();
+        particleLeft.Play();
+        particleRight.Play();
     }
 }

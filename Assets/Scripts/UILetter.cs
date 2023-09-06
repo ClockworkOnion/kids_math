@@ -7,7 +7,7 @@ public class UILetter : MonoBehaviour
     private float timeScaleOffset = 0f;
 
     private float wobbleSpeedFactor = 1f;
-    private float wobbleIntensity = 0.7f;
+    private float wobbleIntensity = 0.4f;
 
 
 

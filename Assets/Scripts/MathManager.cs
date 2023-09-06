@@ -4,21 +4,23 @@ using UnityEngine;
 
 public class MathManager
 {
-    public Equation GetNext() {
+    public Equation GetNext()
+    {
         StageManager.GameMode currentGameMode = GameManager.GetInstance().GetGameMode();
-        switch (currentGameMode) {
+        switch (currentGameMode)
+        {
             case StageManager.GameMode.addLv1:
                 return AddEquation(individualCeiling: 4, solutionCeiling: 5, proximity: 3);
             case StageManager.GameMode.addLv2:
-				return AddEquation(individualCeiling: 10, solutionCeiling: 11, proximity: 5);
+                return AddEquation(individualCeiling: 10, solutionCeiling: 11, proximity: 5);
             case StageManager.GameMode.addLv3:
-				return AddEquation(individualCeiling: 10, solutionCeiling: 20, proximity: 5);
+                return AddEquation(individualCeiling: 10, solutionCeiling: 20, proximity: 5);
             case StageManager.GameMode.findBiggest:
                 return FindLargest();
             default:
                 Debug.LogError("MathManager GetNext was asked to return invalid type. Returning LevelOneEquation instead");
-				return AddEquation(individualCeiling: 4, solutionCeiling: 5, proximity: 5);
-		}
+                return AddEquation(individualCeiling: 4, solutionCeiling: 5, proximity: 5);
+        }
     }
 
     public Equation Level2Equation()
@@ -29,14 +31,15 @@ public class MathManager
     public Equation AddEquation(int individualCeiling, int solutionCeiling, int proximity)
     {
         int solution = Random.Range(1, solutionCeiling);
-        int addend1 = Random.Range(1, Mathf.Min((individualCeiling + 1), solution-2));
+        int addend1 = Random.Range(1, Mathf.Min((individualCeiling + 1), solution - 2));
         int addend2 = solution - addend1;
 
         int notASolution = solution;
-        while (notASolution == solution) {
+        while (notASolution == solution || notASolution <= 0)
+        {
             int alternative =
         notASolution = Mathf.Min(solutionCeiling, solution + Random.Range(1, proximity) * RandSign());
-	}
+        }
 
         string leftDisplay, rightDisplay, centerDisplay;
 
@@ -83,14 +86,16 @@ public class MathManager
     //    while (addend1 * otherMax < solutionCeiling) { otherMax++; }
     //    int addend2 = Random.Range(1, otherMax);
     //    int solution = addend1 * addend2;
-    
+
     //}
 
-    public bool RandBool() {
+    public bool RandBool()
+    {
         return Random.Range(0, 2) == 1;
     }
 
-    public int RandSign() {
+    public int RandSign()
+    {
         return (RandBool() ? 1 : -1);
     }
 
@@ -105,7 +110,7 @@ public class MathManager
             int n1 = Random.Range(1, 5);
             int n2 = Random.Range(1, 5);
             values[i] = n1 + n2;
-            if (values[i] > maxValue) maxValue = values[i]; 
+            if (values[i] > maxValue) maxValue = values[i];
             strings[i] = n1.ToString() + " + " + n2.ToString();
         }
 
@@ -117,7 +122,7 @@ public class MathManager
             index++;
         }
         Debug.Log("values List:");
-        foreach (var v in values )
+        foreach (var v in values)
         {
             Debug.Log(v);
         }

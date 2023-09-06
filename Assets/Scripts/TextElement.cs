@@ -44,7 +44,6 @@ public class TextElement : MonoBehaviour
             // Add the UILetter Component
             UILetter letterScript = obj.AddComponent<UILetter>();
 
-
             index++;
         }
     }
@@ -72,6 +71,5 @@ public class TextElement : MonoBehaviour
             case 7: return Color.white;
             default: return Color.white;
         }
-
     }
 }

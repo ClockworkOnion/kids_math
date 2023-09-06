@@ -13,6 +13,7 @@ public class StageManager : MonoBehaviour
     private Transform playerCar;
     private CarAnimation carAnimation;
     private Speedometer speedometer;
+    private ScoreTracker scoreTracker;
     private Slider currentProblemSlider;
     private Slider totalStageTimeSlider;
     private int targetLane = -1;
@@ -23,7 +24,8 @@ public class StageManager : MonoBehaviour
     private float totalStageTimeLeft = 0f; // The total time left until the stage is over
     private float totalStageTimeTotal = 0f; // Total play time for the stage
 
-    [SerializeField] private float STAGE_TIME_TOTAL = 60f;
+    [SerializeField] private float STAGE_TIME_TOTAL = 15f;
+    [SerializeField] private float BASE_DRIVE_SPEED = 15f;
 
     private float countDownTimerLeft = 3f;
     private float countDownTimerTotal = 3f;
@@ -52,6 +54,7 @@ public class StageManager : MonoBehaviour
         audioSource = GetComponent<AudioSource>();
         currentProblemSlider = GameObject.Find("CurrentProblemSlider").GetComponent<Slider>();
         totalStageTimeSlider = GameObject.Find("StageTimeSlider").GetComponent<Slider>();
+        scoreTracker = GetComponent<ScoreTracker>();
 
         playState = State.countdown;
         highScore = PlayerPrefs.GetInt("Highscore", 0);
@@ -111,10 +114,12 @@ public class StageManager : MonoBehaviour
         if (currentEquation.solutionPositions.Contains(targetLane))
         {
             HandleRightAnswer();
+            scoreTracker.ProblemDone(true);
         }
         else if (!(drivingSpeed <= 5) && !(targetLane == 2))
         {
             HandleWrongAnswer();
+            scoreTracker.ProblemDone(false);
         }
 
         SetNextEquation();
@@ -122,8 +127,10 @@ public class StageManager : MonoBehaviour
 
     void TotalTimeIsUp()
     {
-        playState = State.countdown;
+        playState = State.results;
         countDownTimerLeft = 3f;
+
+        scoreTracker.ShowScores();
 
         // Fade out the progress bars
         float fadeTime = 1;
@@ -170,6 +177,8 @@ public class StageManager : MonoBehaviour
         else
         {
             SetNextEquation();
+            setDriveSpeed(BASE_DRIVE_SPEED);
+            scoreTracker.HideScores();
             playState = State.driving;
             totalStageTimeLeft = STAGE_TIME_TOTAL;
             totalStageTimeTotal = totalStageTimeLeft;
@@ -182,16 +191,13 @@ public class StageManager : MonoBehaviour
 
     void HandleResultsState()
     {
-        if (uiDisplay.equationLeft.GetText() != "You had")
+        scoreTracker.ShowScores();
+        if (Input.GetKeyDown(KeyCode.Space))
         {
-            uiDisplay.ClearDisplay();
-            uiDisplay.equationLeft.SetText("You had");
-            uiDisplay.equationCenter.SetText("30");
-            uiDisplay.equationRight.SetText("Points!");
-        }
-        if (Input.anyKey)
-        {
+            scoreTracker.ResetAll();
+            scoreTracker.HideScores();
             playState = State.countdown;
+            setDriveSpeed(15f);
         }
     }
 
