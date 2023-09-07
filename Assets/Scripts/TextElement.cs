@@ -38,7 +38,7 @@ public class TextElement : MonoBehaviour
 
             objText.colorGradientPreset = colors;
             objText.enableVertexGradient = true;
-            objText.fontSize = 50f;
+            objText.fontSize = 72f;
             objText.alignment = TextAlignmentOptions.Center;
 
             // Add the UILetter Component

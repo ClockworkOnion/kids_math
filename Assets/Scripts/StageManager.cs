@@ -16,6 +16,8 @@ public class StageManager : MonoBehaviour
     private ScoreTracker scoreTracker;
     private Slider currentProblemSlider;
     private Slider totalStageTimeSlider;
+    private TouchControlPanel touchControlPanel;
+    private GameObject touchControlHints;
     private int targetLane = -1;
     private float drivingSpeed = 15f;
     private float driveSpeedAdjust = 5f; // Value to adjust by for right/wrong answer
@@ -62,6 +64,12 @@ public class StageManager : MonoBehaviour
         // Hide sliders initally
         currentProblemSlider.gameObject.GetComponent<CanvasGroup>().alpha = 0;
         totalStageTimeSlider.gameObject.GetComponent<CanvasGroup>().alpha = 0;
+    }
+
+    private void Start()
+    {
+        touchControlPanel = GameObject.Find("TouchControlPanel").GetComponent<TouchControlPanel>();
+        touchControlHints = GameObject.Find("TouchControlHints");
     }
 
     void Update()
@@ -169,6 +177,7 @@ public class StageManager : MonoBehaviour
         string nextString = countdownTexts[Mathf.RoundToInt(progression)];
         if (uiDisplay.equationCenter.GetText() != nextString)
         {
+            touchControlHints.SetActive(true);
             uiDisplay.ClearDisplay();
             uiDisplay.equationCenter.SetText(countdownTexts[Mathf.RoundToInt(progression)]);
         }
@@ -176,6 +185,7 @@ public class StageManager : MonoBehaviour
         if (countDownTimerLeft > 0f) { countDownTimerLeft -= Time.deltaTime; }
         else
         {
+            touchControlHints.SetActive(false);
             SetNextEquation();
             setDriveSpeed(BASE_DRIVE_SPEED);
             scoreTracker.HideScores();
@@ -192,7 +202,7 @@ public class StageManager : MonoBehaviour
     void HandleResultsState()
     {
         scoreTracker.ShowScores();
-        if (Input.GetKeyDown(KeyCode.Space))
+        if (Input.GetKeyDown(KeyCode.Space) || touchControlPanel.GetInput() != -1)
         {
             scoreTracker.ResetAll();
             scoreTracker.HideScores();
@@ -227,7 +237,10 @@ public class StageManager : MonoBehaviour
 
     private void HandleInput()
     {
-        int playerInput = (Input.GetKeyDown("1") ? 1 : Input.GetKeyDown("2") ? 2 : Input.GetKeyDown("3") ? 3 : -1);
+        int keyboardInput = (Input.GetKeyDown("1") ? 1 : Input.GetKeyDown("2") ? 2 : Input.GetKeyDown("3") ? 3 : -1);
+        int touchInput = touchControlPanel.GetInput();
+        int playerInput = (touchInput != -1) ? touchInput: keyboardInput;
+
         if (playerInput != -1)
         {
             targetLane = playerInput;

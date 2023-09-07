@@ -15,28 +15,29 @@ public class MainMenu : MonoBehaviour
 
     private void Awake()
     {
-        // Create child objects for game modes
-        int index = 0;
-        foreach (string mode in gameModes)
-        {
-            // Create the object and add a TextMeshProUGUI
-            GameObject textObject = new GameObject(mode, typeof(RectTransform));
-            textObject.transform.SetParent(transform, false);
-            TextMeshProUGUI textComponent = textObject.AddComponent<TextMeshProUGUI>();
-            textComponent.SetText((index + 1).ToString() + ". " + mode);
-            if (menuFont) textComponent.font = menuFont;
-            textComponent.color = new Color32(245, 245, 121, 255);
+        //// Create child objects for game modes
+        //int index = 0;
+        //foreach (string mode in gameModes)
+        //{
+        //    // Create the object and add a TextMeshProUGUI
+        //    GameObject textObject = new GameObject(mode, typeof(RectTransform));
+        //    textObject.transform.SetParent(transform, false);
+        //    TextMeshProUGUI textComponent = textObject.AddComponent<TextMeshProUGUI>();
+        //    textComponent.SetText((index + 1).ToString() + ". " + mode);
+        //    if (menuFont) textComponent.font = menuFont;
+        //    textComponent.color = new Color32(245, 245, 121, 255);
 
-            // Set the position
-            RectTransform rect = textObject.GetComponent<RectTransform>();
-            rect.anchoredPosition += new Vector2(0, -menuItemOffset * index);
+        //    // Set the position
+        //    RectTransform rect = textObject.GetComponent<RectTransform>();
+        //    rect.anchoredPosition += new Vector2(0, -menuItemOffset * index);
 
-            // Remember the reference in List
-            menuTextObjects.Add(textObject);
+        //    // Remember the reference in List
+        //    menuTextObjects.Add(textObject);
 
-            index++;
-        }
+        //    index++;
+        //}
     }
+
 
     private void Start()
     {
@@ -70,11 +71,32 @@ public class MainMenu : MonoBehaviour
         }
     }
 
-    private void CameraWobbleUp() {
+    public void StartGame(int level)
+    {
+        switch (level)
+        {
+            case 1:
+                GameManager.GetInstance().SetGameMode(StageManager.GameMode.addLv1);
+                break;
+            case 2:
+                GameManager.GetInstance().SetGameMode(StageManager.GameMode.addLv2);
+                break;
+            case 3:
+                GameManager.GetInstance().SetGameMode(StageManager.GameMode.addLv3);
+                break;
+            default:
+                break;
+        }
+        SceneManager.LoadScene("EasyModeScene");
+    }
+
+    private void CameraWobbleUp()
+    {
         LeanTween.move(mainCamera.gameObject, mainCamera.transform.position + Vector3.up * 2, 30).setEaseInOutSine().setOnComplete(CameraWobbleDown);
     }
 
-    private void CameraWobbleDown() { 
+    private void CameraWobbleDown()
+    {
         LeanTween.move(mainCamera.gameObject, mainCamera.transform.position + Vector3.up * -2, 30).setEaseInOutSine().setOnComplete(CameraWobbleUp);
     }
 
