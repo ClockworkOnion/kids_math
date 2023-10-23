@@ -13,6 +13,8 @@ public class MainMenu : MonoBehaviour
     List<GameObject> menuTextObjects = new List<GameObject>();
     private Camera mainCamera;
 
+    public GameObject mobileCheckmark;
+
     private void Awake()
     {
         //// Create child objects for game modes
@@ -36,6 +38,12 @@ public class MainMenu : MonoBehaviour
 
         //    index++;
         //}
+
+        if (!Application.isMobilePlatform)
+        {
+            Debug.Log("Platform isn't mobile. Removing checkmark...");
+            Destroy(mobileCheckmark);
+        }
     }
 
 

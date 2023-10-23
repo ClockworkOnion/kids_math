@@ -230,7 +230,7 @@ public class StageManager : MonoBehaviour
         uiDisplay.equationLeft.SetText(currentEquation.displayLeft);
         uiDisplay.equationRight.SetText(currentEquation.displayRight);
 
-        timeToSolveLeft = Mathf.Max(1, 8f - drivingSpeed / 7f);
+        timeToSolveLeft = Mathf.Max(1, 8f - drivingSpeed / 4f);
         totalTimeToSolve = timeToSolveLeft;
 
     }

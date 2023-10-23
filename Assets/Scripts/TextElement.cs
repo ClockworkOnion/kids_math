@@ -7,7 +7,7 @@ public class TextElement : MonoBehaviour
 {
     private string currentText;
 
-    private float letterOffset = 20f;
+    private float letterOffset = 30f;
 
     public string GetText() {
         if (currentText == null) return "";
@@ -27,7 +27,7 @@ public class TextElement : MonoBehaviour
 
             // Set the position
             RectTransform rect = obj.GetComponent<RectTransform>();
-            rect.anchoredPosition += new Vector2(letterOffset*index, 1);
+            rect.anchoredPosition += new Vector2(letterOffset*index, 0);
 
             // Set text options (color, size etc)
             TMP_ColorGradient colors = ScriptableObject.CreateInstance<TMP_ColorGradient>();
