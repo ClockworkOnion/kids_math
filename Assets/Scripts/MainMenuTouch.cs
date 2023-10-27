@@ -5,8 +5,7 @@ using TMPro;
 
 public class MainMenuTouch : MonoBehaviour
 {
-
-    private TextMeshProUGUI sensorReadings;
+    private TextMeshProUGUI sensorReadings; // Use in the future to display gyroscope data etc?
     private TextMeshProUGUI statusMsg;
     private int counter = 0;
 

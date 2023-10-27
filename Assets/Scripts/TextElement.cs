@@ -1,12 +1,9 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 
 public class TextElement : MonoBehaviour
 {
     private string currentText;
-
     private float letterOffset = 30f;
 
     public string GetText() {

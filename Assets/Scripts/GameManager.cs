@@ -5,7 +5,6 @@ using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
-
     static GameManager instance;
     static StageManager.GameMode currentMode;
 
@@ -22,20 +21,9 @@ public class GameManager : MonoBehaviour
 
         } else {
             Debug.Log("Previous Game Manager already existed! Destroying...");
-            Destroy(this.gameObject);
+            Destroy(gameObject);
             return;
         }
-    }
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
     }
 
     public void SetGameMode(StageManager.GameMode newMode) {

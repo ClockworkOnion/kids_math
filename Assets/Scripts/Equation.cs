@@ -1,4 +1,3 @@
-
 public struct Equation
 {
     public string displayLeft;

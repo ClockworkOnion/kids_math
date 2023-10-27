@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -7,74 +6,72 @@ using UnityEngine.UI;
 
 public class StageManager : MonoBehaviour
 {
+    public GameObject goalFlag; // Set in inspector
 
-    public static StageManager instance;
-
-    private Transform playerCar;
     private CarAnimation carAnimation;
-    private Speedometer speedometer;
+    private GameObject touchControlHints;
+    private List<ParticleSystem> fireworks;
     private ScoreTracker scoreTracker;
     private Slider currentProblemSlider;
     private Slider totalStageTimeSlider;
+    private Speedometer speedometer;
+    private TextDisplayManager uiDisplay;
     private TouchControlPanel touchControlPanel;
-    private GameObject touchControlHints;
-    private int targetLane = -1;
-    private float drivingSpeed = 15f;
-    private float driveSpeedAdjust = 5f; // Value to adjust by for right/wrong answer
-    private float timeToSolveLeft = 0f; // Current time left to solve an equation
-    private float totalTimeToSolve = 0f; // Total time for the current problem
-    private float totalStageTimeLeft = 0f; // The total time left until the stage is over
-    private float totalStageTimeTotal = 0f; // Total play time for the stage
+    private Transform playerCar;
+
+    private int currentLane = -1;
+    private float drivingSpeed = 1f;
+    private readonly float driveSpeedAdjust = 1f; // Value to adjust by for right/wrong answer
+    private float currentEquationTimeLeft = 0f; // Current time left to solve an equation
+    private float currentEquationTotalTime = 0f; // Total time for the current problem
+    private float stageTimeLeft = 0f; // The total time left until the stage is over
+    private float stageTimeTotal = 0f; // Total play time for the stage
+    private float countDownTimerLeft = 3f;
+    private readonly float countDownTimerTotal = 3f;
 
     [SerializeField] private float STAGE_TIME_TOTAL = 15f;
-    [SerializeField] private float BASE_DRIVE_SPEED = 15f;
+    [SerializeField] private float BASE_DRIVE_SPEED = 1f; // Reset drive speed to this value after a round
 
-    private float countDownTimerLeft = 3f;
-    private float countDownTimerTotal = 3f;
-    private Equation currentEquation;
-    private int rightSolutionPosition = 0;
-    private int playerScore = 0;
     private int highScore = 0;
+    private int playerScore = 0;
+    private int rightSolutionPosition = 0;
+    private int speedChangeThreshold;
+
+    private Equation currentEquation;
     private State playState;
-
-
 
     private AudioSource audioSource;
     public AudioClip wrongAnswer;
     public AudioClip rightAnswer;
 
     private readonly MathManager mathManager = new();
-    public TextDisplayManager uiDisplay;
 
     private void Awake()
     {
         // References
         playerCar = GameObject.Find("PlayerCar").GetComponent<Transform>();
-        carAnimation = playerCar.gameObject.GetComponentInChildren<CarAnimation>();
-        uiDisplay = GameObject.Find("TextDisplayManager").GetComponent<TextDisplayManager>();
-        speedometer = GameObject.Find("Speedoneedle").GetComponent<Speedometer>();
         audioSource = GetComponent<AudioSource>();
+        carAnimation = playerCar.gameObject.GetComponentInChildren<CarAnimation>();
         currentProblemSlider = GameObject.Find("CurrentProblemSlider").GetComponent<Slider>();
-        totalStageTimeSlider = GameObject.Find("StageTimeSlider").GetComponent<Slider>();
+        fireworks = GameObject.Find("Fireworks").GetComponentsInChildren<ParticleSystem>().ToList();
         scoreTracker = GetComponent<ScoreTracker>();
+        speedometer = GameObject.Find("Speedoneedle").GetComponent<Speedometer>();
+        totalStageTimeSlider = GameObject.Find("StageTimeSlider").GetComponent<Slider>();
+        touchControlHints = GameObject.Find("TouchControlHints");
+        touchControlPanel = GameObject.Find("TouchControlPanel").GetComponent<TouchControlPanel>();
+        uiDisplay = GameObject.Find("TextDisplayManager").GetComponent<TextDisplayManager>();
 
         playState = State.countdown;
         highScore = PlayerPrefs.GetInt("Highscore", 0);
 
-        // Hide sliders initally
-        currentProblemSlider.gameObject.GetComponent<CanvasGroup>().alpha = 0;
-        totalStageTimeSlider.gameObject.GetComponent<CanvasGroup>().alpha = 0;
-    }
-
-    private void Start()
-    {
-        touchControlPanel = GameObject.Find("TouchControlPanel").GetComponent<TouchControlPanel>();
-        touchControlHints = GameObject.Find("TouchControlHints");
+        FadeProgressBars(fadeTime: 0, onOrOff: false);
     }
 
     void Update()
     {
-        // State machine
+        if (Input.GetKeyDown(KeyCode.Escape))
+            SceneManager.LoadScene("MainMenuScene");
+
         switch (playState)
         {
             case State.driving:
@@ -94,78 +91,88 @@ public class StageManager : MonoBehaviour
 
     void HandleDrivingState()
     {
-        // Inputs & Menu
-        if (Input.GetKeyDown(KeyCode.Escape)) { SceneManager.LoadScene("MainMenuScene"); }
-        HandleInput();
+        HandleDrivingInput();
 
         uiDisplay.SetStatusText("Time left: "
-            + timeToSolveLeft.ToString().Substring(0, Mathf.Min(3, timeToSolveLeft.ToString().Length))
+            + currentEquationTimeLeft.ToString().Substring(0, Mathf.Min(3, currentEquationTimeLeft.ToString().Length))
             + "\nScore: " + playerScore + "\nHighscore: " + highScore);
 
+        // Track total stage time;
+        if (stageTimeLeft < 0)
+            goalFlag.SetActive(true);
+
         // Timer before time is up
-        if (timeToSolveLeft > 0f)
+        if (currentEquationTimeLeft > 0f)
         {
-            timeToSolveLeft -= Time.deltaTime;
-            totalStageTimeLeft -= Time.deltaTime;
+            currentEquationTimeLeft -= Time.deltaTime;
+            stageTimeLeft -= Time.deltaTime;
 
             // Update timer sliders
-            currentProblemSlider.value = timeToSolveLeft / totalTimeToSolve;
-            totalStageTimeSlider.value = totalStageTimeLeft / totalStageTimeTotal;
-
+            currentProblemSlider.value = currentEquationTimeLeft / currentEquationTotalTime;
+            totalStageTimeSlider.value = stageTimeLeft / stageTimeTotal;
             return;
         }
 
-        // Track total stage time;
-        if (totalStageTimeLeft < 0) TotalTimeIsUp();
-
         // When time is up
-        if (currentEquation.solutionPositions.Contains(targetLane))
-        {
+        if (currentEquation.solutionPositions.Contains(currentLane))
             HandleRightAnswer();
-            scoreTracker.ProblemDone(true);
-        }
-        else if (!(drivingSpeed <= 5) && !(targetLane == 2))
-        {
+        else
             HandleWrongAnswer();
-            scoreTracker.ProblemDone(false);
-        }
 
         SetNextEquation();
     }
 
-    void TotalTimeIsUp()
+    public void EndRound()
     {
+        goalFlag.SetActive(false);
         playState = State.results;
         countDownTimerLeft = 3f;
 
         scoreTracker.ShowScores();
 
-        // Fade out the progress bars
-        float fadeTime = 1;
-        float transpAlpha = 0;
-        float opaqueAlpha = 1;
-        LeanTween.value(gameObject, (float value) => { currentProblemSlider.gameObject.GetComponent<CanvasGroup>().alpha = value; }, opaqueAlpha, transpAlpha, fadeTime).setEaseOutCirc();
-        LeanTween.value(gameObject, (float value) => { totalStageTimeSlider.gameObject.GetComponent<CanvasGroup>().alpha = value; }, opaqueAlpha, transpAlpha, fadeTime).setEaseOutCirc();
+        FadeProgressBars(fadeTime: 1, onOrOff: false);
     }
 
     private void HandleRightAnswer()
     {
-        playerScore += 10;
+        AddScore(10);
         audioSource.PlayOneShot(rightAnswer);
+        carAnimation.smokeBurst();
+        scoreTracker.ProblemDone(true);
+
+        // Adjust speed ticker
+        speedChangeThreshold++;
+        if (speedChangeThreshold > 2)
+        {
+            TweenDriveSpeedTo(drivingSpeed + driveSpeedAdjust);
+            speedChangeThreshold = 0;
+        }
+    }
+
+    private void HandleWrongAnswer()
+    {
+        if (drivingSpeed <= 1 || currentLane == 2)
+            return;
+
+        // Adjust speed ticker
+        speedChangeThreshold--;
+        if (speedChangeThreshold < -1)
+        {
+            TweenDriveSpeedTo(drivingSpeed - driveSpeedAdjust);
+            audioSource.PlayOneShot(wrongAnswer);
+            speedChangeThreshold = 0;
+        }
+        scoreTracker.ProblemDone(false);
+    }
+
+    private void AddScore(int score)
+    {
+        playerScore += score;
         if (playerScore > highScore)
         {
             highScore = playerScore;
             PlayerPrefs.SetInt("Highscore", playerScore);
         }
-        LeanTween.value(drivingSpeed, drivingSpeed + driveSpeedAdjust, 1f).setEase(LeanTweenType.easeInBounce).setOnUpdate(setDriveSpeed);
-
-        carAnimation.smokeBurst();
-    }
-
-    private void HandleWrongAnswer()
-    {
-        LeanTween.value(drivingSpeed, drivingSpeed - driveSpeedAdjust, 1f).setEase(LeanTweenType.easeInElastic).setOnUpdate(setDriveSpeed);
-        audioSource.PlayOneShot(wrongAnswer);
     }
 
     void HandleCountDownState()
@@ -173,41 +180,46 @@ public class StageManager : MonoBehaviour
         // Countdown to next play section
         string[] countdownTexts = { "Ready?", "Set!", "GO!" };
         float progression = (countDownTimerTotal - countDownTimerLeft) / countDownTimerTotal * 2;
-        uiDisplay.SetStatusText(countdownTexts[Mathf.RoundToInt(progression)]);
-        string nextString = countdownTexts[Mathf.RoundToInt(progression)];
-        if (uiDisplay.equationCenter.GetText() != nextString)
+        string currentDisplay = countdownTexts[Mathf.RoundToInt(progression)];
+        uiDisplay.SetStatusText(currentDisplay);
+
+
+        if (uiDisplay.equationCenter.GetText() != currentDisplay) // Don't refresh the string constantly
         {
             touchControlHints.SetActive(true);
             uiDisplay.ClearDisplay();
-            uiDisplay.equationCenter.SetText(countdownTexts[Mathf.RoundToInt(progression)]);
+            uiDisplay.equationCenter.SetText(currentDisplay);
         }
 
-        if (countDownTimerLeft > 0f) { countDownTimerLeft -= Time.deltaTime; }
-        else
+        if (countDownTimerLeft > 0f)
         {
-            touchControlHints.SetActive(false);
-            SetNextEquation();
-            setDriveSpeed(BASE_DRIVE_SPEED);
-            scoreTracker.HideScores();
-            playState = State.driving;
-            totalStageTimeLeft = STAGE_TIME_TOTAL;
-            totalStageTimeTotal = totalStageTimeLeft;
-
-            // Fade in the progress bars
-            LeanTween.value(gameObject, (float value) => { currentProblemSlider.gameObject.GetComponent<CanvasGroup>().alpha = value; }, 0, 1, 1).setEaseOutCirc();
-            LeanTween.value(gameObject, (float value) => { totalStageTimeSlider.gameObject.GetComponent<CanvasGroup>().alpha = value; }, 0, 1, 1).setEaseOutCirc();
+            countDownTimerLeft -= Time.deltaTime;
+            return;
         }
+
+        // Setup driving state
+        touchControlHints.SetActive(false);
+        SetNextEquation();
+        SetDriveSpeed(BASE_DRIVE_SPEED);
+        scoreTracker.HideScores();
+        playState = State.driving;
+        stageTimeLeft = stageTimeTotal = STAGE_TIME_TOTAL;
+        FadeProgressBars(fadeTime: 1, onOrOff: true);
     }
 
     void HandleResultsState()
     {
         scoreTracker.ShowScores();
+        fireworks.ForEach((fw) => { if (fw.isStopped) fw.Play(); });
+
         if (Input.GetKeyDown(KeyCode.Space) || touchControlPanel.GetInput() != -1)
         {
+            // Set up next stage
+            fireworks.ForEach((fw) => fw.Stop());
             scoreTracker.ResetAll();
             scoreTracker.HideScores();
             playState = State.countdown;
-            setDriveSpeed(15f);
+            TweenDriveSpeedTo(BASE_DRIVE_SPEED);
         }
     }
 
@@ -216,37 +228,60 @@ public class StageManager : MonoBehaviour
         return drivingSpeed;
     }
 
-    public void setDriveSpeed(float newSpeed)
+
+    public void TweenDriveSpeedTo(float newSpeed) { 
+        LeanTween.value(drivingSpeed, newSpeed, 1f)
+            .setEase(LeanTweenType.easeInElastic)
+            .setOnUpdate(SetDriveSpeed);
+    }
+
+    public void SetDriveSpeed(float newSpeed)
     {
         drivingSpeed = newSpeed;
-        speedometer.rotateTo(120 - newSpeed * 4);
+        speedometer.rotateTo(120 - newSpeed * 12);
     }
 
     private void SetNextEquation()
     {
-        uiDisplay.ClearDisplay();
         currentEquation = mathManager.GetNext();
+        uiDisplay.ClearDisplay();
         uiDisplay.equationCenter.SetText(currentEquation.displayCenter);
         uiDisplay.equationLeft.SetText(currentEquation.displayLeft);
         uiDisplay.equationRight.SetText(currentEquation.displayRight);
 
-        timeToSolveLeft = Mathf.Max(1, 8f - drivingSpeed / 4f);
-        totalTimeToSolve = timeToSolveLeft;
+        currentEquationTimeLeft = 5 - drivingSpeed;
+        currentEquationTimeLeft = Mathf.Clamp(currentEquationTimeLeft, 1, 3);
+        currentEquationTotalTime = currentEquationTimeLeft;
 
     }
 
-    private void HandleInput()
+    private void FadeProgressBars(float fadeTime, bool onOrOff)
     {
-        int keyboardInput = (Input.GetKeyDown("1") ? 1 : Input.GetKeyDown("2") ? 2 : Input.GetKeyDown("3") ? 3 : -1);
+        float targetAlpha = onOrOff ? 1f : 0f;
+        float startAlpha = onOrOff ? 0f : 1f;
+        LeanTween.value(gameObject, SetBarsAlpha, startAlpha, targetAlpha, fadeTime).setEaseOutCirc();
+        LeanTween.value(gameObject, SetBarsAlpha, startAlpha, targetAlpha, fadeTime).setEaseOutCirc();
+
+        void SetBarsAlpha(float alpha)
+        {
+            currentProblemSlider.gameObject.GetComponent<CanvasGroup>().alpha = alpha;
+            totalStageTimeSlider.gameObject.GetComponent<CanvasGroup>().alpha = alpha;
+        }
+    }
+
+    private void HandleDrivingInput()
+    {
+        int keyboardInput = Input.GetKeyDown("1") ? 1 : Input.GetKeyDown("2") ? 2 : Input.GetKeyDown("3") ? 3 : -1;
         int touchInput = touchControlPanel.GetInput();
-        int playerInput = (touchInput != -1) ? touchInput: keyboardInput;
+        int playerInput = (touchInput != -1) ? touchInput : keyboardInput;
 
         if (playerInput != -1)
         {
-            targetLane = playerInput;
+            currentLane = playerInput;
             float targetXPosition = (playerInput == 1 ? -2f : playerInput == 2 ? 0f : 2f);
             LeanTween.cancel(playerCar.gameObject);
-            LeanTween.move(playerCar.gameObject, new Vector3(targetXPosition, 0, 0), 1).setEaseInOutCubic().setOnComplete(() => { });
+            LeanTween.move(playerCar.gameObject, new Vector3(targetXPosition, 0, 0), 1)
+                .setEaseInOutCubic();
         }
     }
 
@@ -259,6 +294,4 @@ public class StageManager : MonoBehaviour
     {
         addLv1, addLv2, addSubLv1, addSubLv2, addLv3, addSubLv3, findBiggest
     }
-
 }
-

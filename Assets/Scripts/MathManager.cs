@@ -37,8 +37,7 @@ public class MathManager
         int notASolution = solution;
         while (notASolution == solution || notASolution <= 0)
         {
-            int alternative =
-        notASolution = Mathf.Min(solutionCeiling, solution + Random.Range(1, proximity) * RandSign());
+             notASolution = Mathf.Min(solutionCeiling, solution + Random.Range(1, proximity) * RandSign());
         }
 
         string leftDisplay, rightDisplay, centerDisplay;
@@ -79,15 +78,6 @@ public class MathManager
 
         return new Equation(leftDisplay, rightDisplay, centerDisplay, solution, solutionPosition);
     }
-
-    //public Equation MultEquation(int individualCeiling, int solutionCeiling) {
-    //    int addend1 = Random.Range(1, individualCeiling);
-    //    int otherMax = 0;
-    //    while (addend1 * otherMax < solutionCeiling) { otherMax++; }
-    //    int addend2 = Random.Range(1, otherMax);
-    //    int solution = addend1 * addend2;
-
-    //}
 
     public bool RandBool()
     {

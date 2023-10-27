@@ -1,11 +1,8 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 
 public class TextDisplayManager : MonoBehaviour
 {
-
     public TextElement equationLeft;
     public TextElement equationCenter;
     public TextElement equationRight;
@@ -27,7 +24,6 @@ public class TextDisplayManager : MonoBehaviour
                 break;
         }
     }
-
 
     public void SetStatusText(string text) {
         statusText.SetText(text);
