@@ -9,6 +9,7 @@ public class StageManager : MonoBehaviour
     public GameObject goalFlag; // Set in inspector
 
     private CarAnimation carAnimation;
+    private CarCustomizer carCustomizer;
     private GameObject touchControlHints;
     private List<ParticleSystem> fireworks;
     private ScoreTracker scoreTracker;
@@ -50,6 +51,7 @@ public class StageManager : MonoBehaviour
     {
         // References
         playerCar = GameObject.Find("PlayerCar").GetComponent<Transform>();
+        carCustomizer = playerCar.GetComponentInChildren<CarCustomizer>();
         audioSource = GetComponent<AudioSource>();
         carAnimation = playerCar.gameObject.GetComponentInChildren<CarAnimation>();
         currentProblemSlider = GameObject.Find("CurrentProblemSlider").GetComponent<Slider>();
@@ -65,6 +67,12 @@ public class StageManager : MonoBehaviour
         highScore = PlayerPrefs.GetInt("Highscore", 0);
 
         FadeProgressBars(fadeTime: 0, onOrOff: false);
+    }
+
+    private void Start()
+    {
+        // Set up selected material on player car
+        Material currentMat = GameManager.GetInstance().carMaterial;
     }
 
     void Update()
@@ -197,7 +205,7 @@ public class StageManager : MonoBehaviour
             return;
         }
 
-        // Setup driving state
+        // Setup next driving state
         touchControlHints.SetActive(false);
         SetNextEquation();
         SetDriveSpeed(BASE_DRIVE_SPEED);
