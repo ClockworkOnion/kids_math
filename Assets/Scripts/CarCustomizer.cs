@@ -14,4 +14,10 @@ public class CarCustomizer : MonoBehaviour
         mats[0] = mat;
         carFrameRenderer.materials = mats;
     }
+
+    public void Start()
+    {
+        if (GameManager.GetInstance().carMaterial is Material mat)
+		    SwitchMaterial(mat);
+    }
 }

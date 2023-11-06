@@ -11,7 +11,7 @@ public class CarAnimation : MonoBehaviour
     public Transform car_frame;
 
     public float drivingSpeed = 5f;
-    public Transform parent;
+    private Transform parent;
 
     private float prevX = 0f;
     private float currentX = 0f;
@@ -38,7 +38,7 @@ public class CarAnimation : MonoBehaviour
         drivingSpeed = stageManager.getDriveSpeed() / 7;
 
         // Set car rotation according to movement between last frame
-        float xDiff = (transform.position.x - prevX) * 100;
+        float xDiff = (transform.position.x - prevX) * 300;
         Vector3 rotationAngles = new Vector3(0, 180 + xDiff, 0);
         transform.rotation = Quaternion.Euler(rotationAngles);
         prevX = transform.position.x;
@@ -52,16 +52,17 @@ public class CarAnimation : MonoBehaviour
 
     private void rotateTires()
     {
-        tire_left_front.Rotate(Vector3.right, drivingSpeed);
-        tire_left_rear.Rotate(Vector3.right, drivingSpeed);
-        tire_right_front.Rotate(-Vector3.right, drivingSpeed);
-        tire_right_rear.Rotate(-Vector3.right, drivingSpeed);
+        float rotateSpeed = drivingSpeed * 10f;
+        tire_left_front.Rotate(Vector3.forward, rotateSpeed);
+        tire_left_rear.Rotate(Vector3.forward, rotateSpeed);
+        tire_right_front.Rotate(-Vector3.forward, -rotateSpeed);
+        tire_right_rear.Rotate(-Vector3.forward, -rotateSpeed);
     }
 
     private void jitterFrame()
     {
         float timeStamp = Time.fixedTime;
-        float displacement = (2f * Mathf.Sin(10f * timeStamp) + 3f * Mathf.Sin(2f * timeStamp) + 2f * Mathf.Sin(30f * timeStamp) + 25) * 0.01f;
+        float displacement = (2f * Mathf.Sin(10f * timeStamp) + 3f * Mathf.Sin(2f * timeStamp) + 2f * Mathf.Sin(30f * timeStamp) + 25) * 0.005f;
         Vector3 displace_vector = new Vector3(0, displacement, 0);
         car_frame.position = parent.position + displace_vector;
     }

@@ -103,7 +103,7 @@ public class StageManager : MonoBehaviour
 
         uiDisplay.SetStatusText("Time left: "
             + currentEquationTimeLeft.ToString().Substring(0, Mathf.Min(3, currentEquationTimeLeft.ToString().Length))
-            + "\nScore: " + playerScore + "\nHighscore: " + highScore);
+            + "\nScore: " + playerScore + "\nHighscore: " + highScore + "\nCoins: " + PlayerPrefs.GetInt("player_money"));
 
         // Track total stage time;
         if (stageTimeLeft < 0)
@@ -137,6 +137,7 @@ public class StageManager : MonoBehaviour
         countDownTimerLeft = 3f;
 
         scoreTracker.ShowScores();
+        GameManager.GetInstance().AddPlayerMoney(playerScore);
 
         FadeProgressBars(fadeTime: 1, onOrOff: false);
     }
@@ -159,6 +160,9 @@ public class StageManager : MonoBehaviour
 
     private void HandleWrongAnswer()
     {
+        audioSource.PlayOneShot(wrongAnswer);
+        scoreTracker.ProblemDone(false);
+
         if (drivingSpeed <= 1 || currentLane == 2)
             return;
 
@@ -167,10 +171,8 @@ public class StageManager : MonoBehaviour
         if (speedChangeThreshold < -1)
         {
             TweenDriveSpeedTo(drivingSpeed - driveSpeedAdjust);
-            audioSource.PlayOneShot(wrongAnswer);
             speedChangeThreshold = 0;
         }
-        scoreTracker.ProblemDone(false);
     }
 
     private void AddScore(int score)

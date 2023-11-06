@@ -127,4 +127,5 @@ public class ScoreTracker : MonoBehaviour
         });
         historyText.text = $"History:\nRuns: {numberOfRuns}\nTotal {sumHistoryCorrect} correct\nout of {sumHistoryTotal} problems.";
     }
+
 }

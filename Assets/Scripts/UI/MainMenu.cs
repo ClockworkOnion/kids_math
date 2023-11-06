@@ -8,11 +8,15 @@ public class MainMenu : MonoBehaviour
     public int menuItemOffset = 80;
     public TMP_FontAsset menuFont;
     private Camera mainCamera;
+    private TextMeshProUGUI playerCoinsText;
 
     public GameObject mobileCheckmark;
 
     private void Awake()
     {
+        playerCoinsText = GameObject.Find("CoinsText").GetComponent<TextMeshProUGUI>();
+        playerCoinsText.SetText("Coins: " + PlayerPrefs.GetInt("player_money").ToString());
+
         if (!Application.isMobilePlatform)
         {
             Debug.Log("Platform isn't mobile. Removing checkmark...");
