@@ -9,10 +9,11 @@ public class ScoreTracker : MonoBehaviour
     private int problemsTotal = 0;
     private int problemsSolved = 0;
     private float topSpeed = 0;
+    private int scoreStreak = 0;
 
     private List<int[]> history = new List<int[]>();
 
-    private GameObject scoreCanvas;
+    private GameObject stageSummary;
     private TextMeshProUGUI scoreText;
 
     private GameObject historyPanel;
@@ -22,13 +23,13 @@ public class ScoreTracker : MonoBehaviour
 
     private void Awake()
     {
-        scoreCanvas = GameObject.Find("StageSummaryCanvas");
+        stageSummary = GameObject.Find("StageSummaryCanvas");
         scoreText = GameObject.Find("ScoreText").GetComponent<TextMeshProUGUI>();
 
         historyPanel = GameObject.Find("History");
         historyText = historyPanel.GetComponentInChildren<TextMeshProUGUI>();
         historyPanel.SetActive(false);
-        scoreCanvas.SetActive(false);
+        stageSummary.SetActive(false);
     }
 
     private void Update()
@@ -56,11 +57,86 @@ public class ScoreTracker : MonoBehaviour
         topSpeed = 0f;
     }
 
-    public void ProblemDone(bool correctly)
+    /*
+    SCORING SYSTEM
+    addLv1 -> subLv1 -> AddSubLv1 -> (5 point)
+    Addlv2 -> subLv2 -> AddSubLv2 -> (10 point)
+    Addlv3 -> subLv3 -> AddSubLv3 -> (20 point)
+    Addlv4 -> subLv4 -> AddSubLv4 -> (40 point)
+
+    MultLv1 -> DivLv1 -> MultDivLv1 -> (20 point)
+    MultLv2 -> DivLv2 -> MultDivLv2 -> (40 point)
+    MultLv3 -> DivLv3 -> MultDivLv3 -> (80 point)
+    MultLv4 -> DivLv4 -> MultDivLv4 -> (120 point)
+
+    AddSubMultDivLv1 -> ... AddSubMultDivLv4 (200 point)
+
+    3x right answer -> double points
+    5x right answer -> triple points
+    */
+
+    /// <summary>
+    /// Records the whether an equation was solved correctly or not and returns the appropriate score
+    /// </summary>
+    /// <param name="correctly">True if the equation was solved correctly, false if not</param>
+    /// <returns>The amount of score awarded for solving the equation, or 0 if it was solved incorrectly</returns>
+    public int ProblemDone(bool correctly, StageManager.GameMode currentGameMode)
     {
         problemsTotal++;
-        if (correctly) problemsSolved++;
+        if (correctly)
+        {
+            problemsSolved++;
+            scoreStreak++;
+        }
+        else
+        {
+            scoreStreak = 0;
+            return 0;
+        }
+
+        int baseScore = scores[currentGameMode];
+        int multiplier = scoreStreak > 5 ? 3 : scoreStreak > 3 ? 2 : 1;
+        return baseScore * multiplier;
     }
+
+    private Dictionary<StageManager.GameMode, int> scores = new Dictionary<StageManager.GameMode, int> {
+            {StageManager.GameMode.addLv1, 5 },
+            {StageManager.GameMode.subLv1, 5 },
+            {StageManager.GameMode.addSubLv1, 5 },
+
+            {StageManager.GameMode.addLv2, 10 },
+            {StageManager.GameMode.subLv2, 10 },
+            {StageManager.GameMode.addSubLv2, 10},
+
+            {StageManager.GameMode.addLv3, 20},
+            {StageManager.GameMode.subLv3, 20},
+            {StageManager.GameMode.addSubLv3, 20},
+
+            {StageManager.GameMode.addLv4, 40},
+            {StageManager.GameMode.subLv4, 40},
+            {StageManager.GameMode.addSubLv4, 40},
+
+            {StageManager.GameMode.multLv1, 20},
+            {StageManager.GameMode.divLv1, 20},
+            {StageManager.GameMode.multDivLv1, 20},
+
+            {StageManager.GameMode.multLv2, 40},
+            {StageManager.GameMode.divLv2, 40},
+            {StageManager.GameMode.multDivLv2, 40},
+
+            {StageManager.GameMode.multLv3, 80},
+            {StageManager.GameMode.divLv3, 80},
+            {StageManager.GameMode.multDivLv3, 80},
+
+            {StageManager.GameMode.multLv4, 120},
+            {StageManager.GameMode.divLv4, 120},
+            {StageManager.GameMode.multDivLv4, 120},
+
+            {StageManager.GameMode.addSubMultDivLv1, 30},
+            {StageManager.GameMode.addSubMultDivLv2, 60},
+            {StageManager.GameMode.addSubMultDivLv3, 120},
+            {StageManager.GameMode.addSubMultDivLv4, 180},
+        };
 
     public void UpdateTopSpeed(float speed)
     {
@@ -84,7 +160,7 @@ public class ScoreTracker : MonoBehaviour
 
     public void ShowScores()
     {
-        scoreCanvas.SetActive(true);
+        stageSummary.SetActive(true);
         float ratio = (problemsTotal > 0) ? ((float)problemsSolved / (float)problemsTotal) * 100 : 100;
 
         string solvedCounter = "";
@@ -110,7 +186,7 @@ public class ScoreTracker : MonoBehaviour
 
     public void HideScores()
     {
-        scoreCanvas.SetActive(false);
+        stageSummary.SetActive(false);
         // TODO add a fade out animation
     }
 

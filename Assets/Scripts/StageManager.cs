@@ -35,7 +35,6 @@ public class StageManager : MonoBehaviour
 
     private int highScore = 0;
     private int playerScore = 0;
-    private int rightSolutionPosition = 0;
     private int speedChangeThreshold;
 
     private Equation currentEquation;
@@ -78,7 +77,9 @@ public class StageManager : MonoBehaviour
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.Escape))
-            SceneManager.LoadScene("MainMenuScene");
+        {
+            BackToMenu();
+        }
 
         switch (playState)
         {
@@ -122,10 +123,7 @@ public class StageManager : MonoBehaviour
         }
 
         // When time is up
-        if (currentEquation.solutionPositions.Contains(currentLane))
-            HandleRightAnswer();
-        else
-            HandleWrongAnswer();
+        HandleAnswer((currentEquation.solutionPositions.Contains(currentLane)));
 
         SetNextEquation();
     }
@@ -142,27 +140,28 @@ public class StageManager : MonoBehaviour
         FadeProgressBars(fadeTime: 1, onOrOff: false);
     }
 
-    private void HandleRightAnswer()
+    private void HandleAnswer(bool solvedCorrectly)
     {
-        AddScore(10);
-        audioSource.PlayOneShot(rightAnswer);
-        carAnimation.smokeBurst();
-        scoreTracker.ProblemDone(true);
+        audioSource.PlayOneShot(solvedCorrectly ? rightAnswer : wrongAnswer);
+        AddScore(scoreTracker.ProblemDone(solvedCorrectly, GameManager.GetInstance().GetGameMode()));
 
-        // Adjust speed ticker
-        speedChangeThreshold++;
-        if (speedChangeThreshold > 2)
+        if (solvedCorrectly)
         {
-            TweenDriveSpeedTo(drivingSpeed + driveSpeedAdjust);
-            speedChangeThreshold = 0;
+            carAnimation.smokeBurst();
+
+            // Adjust speed ticker
+            speedChangeThreshold++;
+            if (speedChangeThreshold > 2)
+            {
+                TweenDriveSpeedTo(drivingSpeed + driveSpeedAdjust);
+                speedChangeThreshold = 0;
+            }
+            return;
         }
-    }
 
-    private void HandleWrongAnswer()
-    {
-        audioSource.PlayOneShot(wrongAnswer);
-        scoreTracker.ProblemDone(false);
+        // Not solved correctly...
 
+        // Get a pass when too slow or in the middle lane...
         if (drivingSpeed <= 1 || currentLane == 2)
             return;
 
@@ -223,14 +222,28 @@ public class StageManager : MonoBehaviour
         fireworks.ForEach((fw) => { if (fw.isStopped) fw.Play(); });
 
         if (Input.GetKeyDown(KeyCode.Space) || touchControlPanel.GetInput() != -1)
-        {
-            // Set up next stage
-            fireworks.ForEach((fw) => fw.Stop());
-            scoreTracker.ResetAll();
-            scoreTracker.HideScores();
-            playState = State.countdown;
-            TweenDriveSpeedTo(BASE_DRIVE_SPEED);
-        }
+            RepeatStage();
+
+        if (Input.GetKeyDown(KeyCode.N))
+            StartNextStage();
+    }
+
+    public void StartNextStage()
+    {
+        int currentProgress = Mathf.Min(PlayerPrefs.GetInt("stageProgression") + 1, GameManager.GetInstance().stageProgression.Count - 1);
+        PlayerPrefs.SetInt("stageProgression", currentProgress);
+        GameMode nextGameMode = GameManager.GetInstance().stageProgression[currentProgress];
+        GameManager.GetInstance().SetGameMode(nextGameMode);
+        SceneManager.LoadScene("EasyModeScene");
+    }
+
+    public void RepeatStage()
+    {
+        fireworks.ForEach((fw) => fw.Stop());
+        scoreTracker.ResetAll();
+        scoreTracker.HideScores();
+        playState = State.countdown;
+        TweenDriveSpeedTo(BASE_DRIVE_SPEED);
     }
 
     public float getDriveSpeed()
@@ -239,7 +252,8 @@ public class StageManager : MonoBehaviour
     }
 
 
-    public void TweenDriveSpeedTo(float newSpeed) { 
+    public void TweenDriveSpeedTo(float newSpeed)
+    {
         LeanTween.value(drivingSpeed, newSpeed, 1f)
             .setEase(LeanTweenType.easeInElastic)
             .setOnUpdate(SetDriveSpeed);
@@ -295,6 +309,12 @@ public class StageManager : MonoBehaviour
         }
     }
 
+    public void BackToMenu()
+    {
+        LeanTween.cancelAll();
+        SceneManager.LoadScene("MainMenuScene");
+    }
+
     public enum State
     {
         countdown, driving, results
@@ -302,6 +322,17 @@ public class StageManager : MonoBehaviour
 
     public enum GameMode
     {
-        addLv1, addLv2, addSubLv1, addSubLv2, addLv3, addSubLv3, findBiggest
+        addLv1, addLv2, addLv3, addLv4, addLv5,
+        subLv1, subLv2, subLv3, subLv4,
+        addSubLv1, addSubLv2, addSubLv3, addSubLv4,
+
+        multLv1, multLv2, multLv3, multLv4,
+        divLv1, divLv2, divLv3, divLv4,
+        multDivLv1, multDivLv2, multDivLv3, multDivLv4,
+
+        addSubMultDivLv1, addSubMultDivLv2, addSubMultDivLv3, addSubMultDivLv4,
+
+        findBiggest, addMultLv3, addMultLv4,
     }
+
 }

@@ -89,4 +89,43 @@ public class GameManager : MonoBehaviour
         PlayerPrefs.SetInt("PinkMat", 0);
         PlayerPrefs.SetInt("BlackMat", 0);
     }
+
+    public List<StageManager.GameMode> stageProgression = new List<StageManager.GameMode> {
+        StageManager.GameMode.addLv1,
+        StageManager.GameMode.subLv1,
+        StageManager.GameMode.addSubLv1,
+
+        StageManager.GameMode.addLv2,
+        StageManager.GameMode.subLv2,
+        StageManager.GameMode.addSubLv2,
+
+        StageManager.GameMode.addLv3,
+        StageManager.GameMode.subLv3,
+        StageManager.GameMode.addSubLv3,
+
+        StageManager.GameMode.addLv4,
+        StageManager.GameMode.subLv4,
+        StageManager.GameMode.addSubLv4,
+
+        StageManager.GameMode.multLv1,
+        StageManager.GameMode.divLv1,
+        StageManager.GameMode.multDivLv1,
+
+        StageManager.GameMode.multLv2,
+        StageManager.GameMode.divLv2,
+        StageManager.GameMode.multDivLv2,
+
+        StageManager.GameMode.multLv3,
+        StageManager.GameMode.divLv3,
+        StageManager.GameMode.multDivLv3,
+
+        StageManager.GameMode.multLv4,
+        StageManager.GameMode.divLv4,
+        StageManager.GameMode.multDivLv4,
+
+        StageManager.GameMode.addSubMultDivLv1,
+        StageManager.GameMode.addSubMultDivLv2,
+        StageManager.GameMode.addSubMultDivLv3,
+        StageManager.GameMode.addSubMultDivLv4,
+    };
 }
