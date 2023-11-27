@@ -49,7 +49,8 @@ public class MainMenu : MonoBehaviour
     }
 
     public void StartGame() {
-        int currentProgress = PlayerPrefs.GetInt("stageProgression");
+
+        int currentProgress = Mathf.Min(GameManager.GetInstance().stageProgression.Count-1, PlayerPrefs.GetInt("stageProgression"));
         StageManager.GameMode nextGameMode = GameManager.GetInstance().stageProgression[currentProgress];
         GameManager.GetInstance().SetGameMode(nextGameMode);
         SceneManager.LoadScene("EasyModeScene");
