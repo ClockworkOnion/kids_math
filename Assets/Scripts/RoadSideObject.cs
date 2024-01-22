@@ -5,13 +5,30 @@ using UnityEngine;
 public class RoadSideObject : MonoBehaviour
 {
     StageManager stageManager;
+    bool isMoving = true;
 
     private void Start()
     {
         stageManager = GameObject.Find("StageManager").GetComponent<StageManager>();
+        stageManager.stageStart.AddListener(OnStageStart);
+        stageManager.stageEnd.AddListener(OnStageEnd);
     }
+
+    public void OnStageStart() {
+        isMoving = true;
+    }
+
+    public void OnStageEnd() {
+        isMoving = false;
+    }
+
     private void FixedUpdate()
     {
+        if (isMoving)
+            MoveObject();
+    }
+
+    private void MoveObject() { 
         float speed = stageManager.getDriveSpeed();
         const float FACTOR = 10;
         Vector3 worldForward = new(0, 0, -1);

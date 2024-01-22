@@ -7,7 +7,7 @@ using TMPro;
 public class GameManager : MonoBehaviour
 {
     static GameManager instance;
-    static StageManager.GameMode currentMode;
+    public static StageManager.GameMode currentMode;
 
     public Material carMaterial { get; private set; }
 
@@ -46,6 +46,27 @@ public class GameManager : MonoBehaviour
         {
             TextMeshProUGUI CoinsText = GameObject.Find("CoinsText").GetComponent<TextMeshProUGUI>();
             CoinsText?.SetText("Coins: " + PlayerPrefs.GetInt("player_money"));
+        }
+
+        // Debug reset stage progression
+        if (Input.GetKey(KeyCode.R) && Input.GetKey(KeyCode.P))
+        {
+            PlayerPrefs.SetInt("stageProgression", 0);
+        }
+
+        if (Input.GetKey(KeyCode.P) && Input.GetKey(KeyCode.Alpha1))
+        {
+            PlayerPrefs.SetInt("stageProgression", 1);
+        }
+
+        if (Input.GetKey(KeyCode.P) && Input.GetKey(KeyCode.Alpha2))
+        {
+            PlayerPrefs.SetInt("stageProgression", 2);
+        }
+
+        if (Input.GetKey(KeyCode.P) && Input.GetKey(KeyCode.Alpha3))
+        {
+            PlayerPrefs.SetInt("stageProgression", 3);
         }
 
     }

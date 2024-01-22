@@ -3,10 +3,12 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using UnityEngine.Events;
 
 public class StageManager : MonoBehaviour
 {
     public GameObject goalFlag; // Set in inspector
+    public CanvasGroup whiteFader;
 
     private CarAnimation carAnimation;
     private CarCustomizer carCustomizer;
@@ -29,6 +31,7 @@ public class StageManager : MonoBehaviour
     private float stageTimeTotal = 0f; // Total play time for the stage
     private float countDownTimerLeft = 3f;
     private readonly float countDownTimerTotal = 3f;
+    private float whiteFaderAlpha = 0f;
 
     [SerializeField] private float STAGE_TIME_TOTAL = 15f;
     [SerializeField] private float BASE_DRIVE_SPEED = 1f; // Reset drive speed to this value after a round
@@ -43,6 +46,10 @@ public class StageManager : MonoBehaviour
     private AudioSource audioSource;
     public AudioClip wrongAnswer;
     public AudioClip rightAnswer;
+
+    public UnityEvent stageEnd = new();
+    public UnityEvent stageStart = new();
+    public UnityEvent zoomOut = new();
 
     private readonly MathManager mathManager = new();
 
@@ -72,6 +79,7 @@ public class StageManager : MonoBehaviour
     {
         // Set up selected material on player car
         Material currentMat = GameManager.GetInstance().carMaterial;
+        fireworks.ForEach((fw) => fw.Stop());
     }
 
     void Update()
@@ -100,6 +108,10 @@ public class StageManager : MonoBehaviour
 
     void HandleDrivingState()
     {
+        // for testing purposes: End round early by pressing E+R
+        if (Input.GetKey(KeyCode.E) && Input.GetKey(KeyCode.R))
+            EndRound();
+
         HandleDrivingInput();
 
         uiDisplay.SetStatusText("Time left: "
@@ -130,11 +142,12 @@ public class StageManager : MonoBehaviour
 
     public void EndRound()
     {
+        stageEnd.Invoke();
         goalFlag.SetActive(false);
         playState = State.results;
         countDownTimerLeft = 3f;
 
-        scoreTracker.ShowScores();
+        scoreTracker.ShowScores(playerScore);
         GameManager.GetInstance().AddPlayerMoney(playerScore);
 
         FadeProgressBars(fadeTime: 1, onOrOff: false);
@@ -218,14 +231,26 @@ public class StageManager : MonoBehaviour
 
     void HandleResultsState()
     {
-        scoreTracker.ShowScores();
+        //scoreTracker.ShowScores();
         fireworks.ForEach((fw) => { if (fw.isStopped) fw.Play(); });
 
         if (Input.GetKeyDown(KeyCode.Space) || touchControlPanel.GetInput() != -1)
             RepeatStage();
 
-        if (Input.GetKeyDown(KeyCode.N))
+        if (Input.GetKeyDown(KeyCode.N) && scoreTracker.GetRatio() > .7f)
             StartNextStage();
+    }
+
+    public void FadeToMenu()
+    {
+        zoomOut.Invoke();
+        float fadeTime = 1f;
+        LeanTween.value(gameObject, UpdateFloat, 0f, 1f, fadeTime).setEaseInCubic().setOnComplete(BackToMenu);
+
+        void UpdateFloat(float alpha)
+        {
+            whiteFader.alpha = alpha;
+        }
     }
 
     public void StartNextStage()
@@ -244,6 +269,7 @@ public class StageManager : MonoBehaviour
         scoreTracker.HideScores();
         playState = State.countdown;
         TweenDriveSpeedTo(BASE_DRIVE_SPEED);
+        stageStart.Invoke();
     }
 
     public float getDriveSpeed()

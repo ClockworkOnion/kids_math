@@ -25,14 +25,14 @@ public class MainMenu : MonoBehaviour
         }
 
         int stageProgress = PlayerPrefs.GetInt("stageProgression");
-        stageProgressionIndicator.text = "Stage: " + (stageProgress+1).ToString() +
+        stageProgressionIndicator.text = "Stage: " + (stageProgress + 1).ToString() +
             "\nType: " + GameManager.GetInstance().stageProgression[stageProgress].ToString();
     }
 
     private void Start()
     {
         mainCamera = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<Camera>();
-        CameraWobbleUp();
+        //CameraWobbleUp();
     }
 
     void Update()
@@ -48,12 +48,15 @@ public class MainMenu : MonoBehaviour
         else if (Input.GetKeyDown("9")) StartGame(9);
     }
 
-    public void StartGame() {
+    public void StartGame()
+    {
 
-        int currentProgress = Mathf.Min(GameManager.GetInstance().stageProgression.Count-1, PlayerPrefs.GetInt("stageProgression"));
+        int currentProgress = Mathf.Min(GameManager.GetInstance().stageProgression.Count - 1, PlayerPrefs.GetInt("stageProgression"));
         StageManager.GameMode nextGameMode = GameManager.GetInstance().stageProgression[currentProgress];
         GameManager.GetInstance().SetGameMode(nextGameMode);
-        SceneManager.LoadScene("EasyModeScene");
+
+        MainMenuCamControl camControl = mainCamera.GetComponent<MainMenuCamControl>();
+        camControl.StartAtLevel(currentProgress); // Will call the SceneManager in here
     }
 
     public void StartGame(int level)

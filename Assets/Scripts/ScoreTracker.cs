@@ -13,7 +13,7 @@ public class ScoreTracker : MonoBehaviour
 
     private List<int[]> history = new List<int[]>();
 
-    private GameObject stageSummary;
+    public StageSummary stageSummary;
     private TextMeshProUGUI scoreText;
 
     private GameObject historyPanel;
@@ -23,13 +23,12 @@ public class ScoreTracker : MonoBehaviour
 
     private void Awake()
     {
-        stageSummary = GameObject.Find("StageSummaryCanvas");
+        //stageSummary = GameObject.Find("StageSummaryCanvas"); // assign in inspector
         scoreText = GameObject.Find("ScoreText").GetComponent<TextMeshProUGUI>();
 
         historyPanel = GameObject.Find("History");
         historyText = historyPanel.GetComponentInChildren<TextMeshProUGUI>();
         historyPanel.SetActive(false);
-        stageSummary.SetActive(false);
     }
 
     private void Update()
@@ -158,10 +157,17 @@ public class ScoreTracker : MonoBehaviour
         return topSpeed;
     }
 
-    public void ShowScores()
+    public float GetRatio()
     {
-        stageSummary.SetActive(true);
-        float ratio = (problemsTotal > 0) ? ((float)problemsSolved / (float)problemsTotal) * 100 : 100;
+        return (problemsTotal > 0) ? ((float)problemsSolved / (float)problemsTotal) * 100 : 100;
+    }
+
+    public void ShowScores(int coinsEarned)
+    {
+        stageSummary.Show();
+
+        /*
+        float ratio = GetRatio();
 
         string solvedCounter = "";
         for (int i = 0; i < problemsSolved; i++)
@@ -181,13 +187,12 @@ public class ScoreTracker : MonoBehaviour
         : (ratio > 30) ? "Try again? You can do it!"
         : "Keep on practicing!";
         scoreText.text = $"Right answers:\n{solvedCounter}\nWrong answers:\n{missedCounter}\n{message}\nPress Space to Continue!";
-        // TODO add a pop in animation
+        */
     }
 
     public void HideScores()
     {
-        stageSummary.SetActive(false);
-        // TODO add a fade out animation
+        stageSummary.Hide();
     }
 
     public void UpdateHistoryPanel()

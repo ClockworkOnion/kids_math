@@ -12,6 +12,7 @@ public class CarAnimation : MonoBehaviour
 
     public float drivingSpeed = 5f;
     private Transform parent;
+    private Vector3 initialPosition;
 
     private float prevX = 0f;
     private float currentX = 0f;
@@ -26,11 +27,14 @@ public class CarAnimation : MonoBehaviour
         parent = GameObject.Find("PlayerCar").GetComponent<Transform>();
         particleLeft = GameObject.Find("ParticleLeft").GetComponent<ParticleSystem>();
         particleRight = GameObject.Find("ParticleRight").GetComponent<ParticleSystem>();
+        initialPosition = transform.position;
     }
 
     void Start()
     {
         stageManager = GameObject.Find("StageManager").GetComponent<StageManager>();
+        stageManager.stageEnd.AddListener(OnStageEnd);
+        stageManager.stageStart.AddListener(OnStageStart);
     }
 
     void Update()
@@ -42,6 +46,16 @@ public class CarAnimation : MonoBehaviour
         Vector3 rotationAngles = new Vector3(0, 180 + xDiff, 0);
         transform.rotation = Quaternion.Euler(rotationAngles);
         prevX = transform.position.x;
+    }
+
+    private void OnStageStart() {
+        LeanTween.cancel(parent.gameObject);
+        parent.transform.position = initialPosition;
+    }
+
+    private void OnStageEnd() {
+        LeanTween.cancel(parent.gameObject);
+        LeanTween.move(parent.gameObject, transform.position + new Vector3(0, 0, 200), 2f);
     }
 
     private void FixedUpdate()
