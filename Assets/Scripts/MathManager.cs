@@ -57,13 +57,16 @@ public class MathManager
             case StageManager.GameMode.addSubLv2:
                 return RandBool() ? SubtractEquation(individualCeiling: 10, proximity: 3) : 
 		            AddEquation(individualCeiling: 10, solutionCeiling: 11, proximity: 5);
+            case StageManager.GameMode.addSubLv3:
+                return RandBool() ? SubtractEquation(individualCeiling: 15, proximity: 3) : 
+		            AddEquation(individualCeiling: 15, solutionCeiling: 13, proximity: 3);
 	
 	        // others
             case StageManager.GameMode.findBiggest:
                 return FindLargest();
 
             default:
-                Debug.LogError("MathManager GetNext was asked to return invalid type. Returning LevelOneEquation instead");
+                Debug.LogError("MathManager GetNext was asked to return invalid type: " + currentGameMode.ToString() + ". Returning LevelOneEquation instead");
                 return AddEquation(individualCeiling: 4, solutionCeiling: 5, proximity: 5);
         }
     }

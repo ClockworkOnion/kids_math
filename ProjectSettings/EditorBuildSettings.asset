@@ -9,6 +9,12 @@ EditorBuildSettings:
     path: Assets/Scenes/MainMenuScene.unity
     guid: c33413df4d1d245ddabc3df868ce664a
   - enabled: 1
-    path: Assets/Scenes/EasyModeScene.unity
-    guid: 9fc0d4010bbf28b4594072e72b8655ab
+    path: Assets/Scenes/Beach_Drive.unity
+    guid: a21a0f3b840a040bfa3e38c212b4a801
+  - enabled: 1
+    path: Assets/Scenes/City_Drive.unity
+    guid: f1d867e649cb8402f85b1852d662c3a3
+  - enabled: 1
+    path: Assets/Scenes/SmallTown_Drive.unity
+    guid: 12129abe82fc7428f8f993f2adad57b2
   m_configObjects: {}

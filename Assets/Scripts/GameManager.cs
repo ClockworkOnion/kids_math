@@ -35,6 +35,8 @@ public class GameManager : MonoBehaviour
 
     private void Update()
     {
+
+        #region Debug keys region...
         // Debug Reset Colors key combo and print money TODO delete and remove TMPro namespace TODO
         if (Input.GetKey(KeyCode.D) && Input.GetKey(KeyCode.M))
             ResetColors();
@@ -68,6 +70,9 @@ public class GameManager : MonoBehaviour
         {
             PlayerPrefs.SetInt("stageProgression", 3);
         }
+        // End of debug keys code region
+        #endregion
+
 
     }
 

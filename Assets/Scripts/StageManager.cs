@@ -243,6 +243,10 @@ public class StageManager : MonoBehaviour
 
     public void FadeToMenu()
     {
+        // Increase stage counter (this should be done elsewhere...)
+        int currentProgression = PlayerPrefs.GetInt("stageProgression");
+        PlayerPrefs.SetInt("stageProgression", currentProgression + 1);
+
         zoomOut.Invoke();
         float fadeTime = 1f;
         LeanTween.value(gameObject, UpdateFloat, 0f, 1f, fadeTime).setEaseInCubic().setOnComplete(BackToMenu);
@@ -251,6 +255,12 @@ public class StageManager : MonoBehaviour
         {
             whiteFader.alpha = alpha;
         }
+    }
+
+    public void BackToMenu()
+    {
+        LeanTween.cancelAll();
+        SceneManager.LoadScene("MainMenuScene");
     }
 
     public void StartNextStage()
@@ -333,12 +343,6 @@ public class StageManager : MonoBehaviour
             LeanTween.move(playerCar.gameObject, new Vector3(targetXPosition, 0, 0), 1)
                 .setEaseInOutCubic();
         }
-    }
-
-    public void BackToMenu()
-    {
-        LeanTween.cancelAll();
-        SceneManager.LoadScene("MainMenuScene");
     }
 
     public enum State

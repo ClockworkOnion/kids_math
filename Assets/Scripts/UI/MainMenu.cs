@@ -51,12 +51,16 @@ public class MainMenu : MonoBehaviour
     public void StartGame()
     {
 
+        // Game mode sets the difficulty of the presented equations
         int currentProgress = Mathf.Min(GameManager.GetInstance().stageProgression.Count - 1, PlayerPrefs.GetInt("stageProgression"));
         StageManager.GameMode nextGameMode = GameManager.GetInstance().stageProgression[currentProgress];
         GameManager.GetInstance().SetGameMode(nextGameMode);
 
+        // Next up determines which scene is loaded (number of scenes < number of difficulties, thus % and wrap)
         MainMenuCamControl camControl = mainCamera.GetComponent<MainMenuCamControl>();
-        camControl.StartAtLevel(currentProgress); // Will call the SceneManager in here
+        int sceneNumber = currentProgress % (ModeData.sceneProgression.Count);
+        ModeData.StageScenes nextScene = ModeData.sceneProgression[sceneNumber];
+        camControl.StartAtLevel(sceneNumber, nextScene); // Will call the SceneManager in here
     }
 
     public void StartGame(int level)
@@ -99,7 +103,7 @@ public class MainMenu : MonoBehaviour
             default:
                 break;
         }
-        SceneManager.LoadScene("EasyModeScene");
+        SceneManager.LoadScene("SmallTown_Drive");
     }
 
     private void CameraWobbleUp()

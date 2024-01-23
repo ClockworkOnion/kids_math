@@ -97,37 +97,37 @@ public static class ModeData
 
     public static Dictionary<Difficulties, DifficultyInfo> difficultyInfo = new Dictionary<Difficulties, DifficultyInfo> {
         {Difficulties.addLv1, new DifficultyInfo(5, "Addition Level 1") },
-        {Difficulties.addLv2, new DifficultyInfo(10, "Addition Level 2") }, 
+        {Difficulties.addLv2, new DifficultyInfo(10, "Addition Level 2") },
         {Difficulties.addLv3, new DifficultyInfo(20, "Addition Level 3") },
         {Difficulties.addLv4, new DifficultyInfo(40, "Addition Level 4") },
 
         {Difficulties.subLv1, new DifficultyInfo(5, "Subtraction Level 1") },
-        {Difficulties.subLv2, new DifficultyInfo(10, "Subtraction Level 2") }, 
+        {Difficulties.subLv2, new DifficultyInfo(10, "Subtraction Level 2") },
         {Difficulties.subLv3, new DifficultyInfo(20, "Subtraction Level 3") },
         {Difficulties.subLv4, new DifficultyInfo(40, "Subtraction Level 4") },
 
         {Difficulties.addSubLv1, new DifficultyInfo(5, "Add & Subtract Level 1") },
-        {Difficulties.addSubLv2, new DifficultyInfo(10, "Add & Subtract Level 2") }, 
+        {Difficulties.addSubLv2, new DifficultyInfo(10, "Add & Subtract Level 2") },
         {Difficulties.addSubLv3, new DifficultyInfo(20, "Add & Subtract Level 3") },
         {Difficulties.addSubLv4, new DifficultyInfo(40, "Add & Subtract Level 4") },
 
         {Difficulties.multLv1, new DifficultyInfo(20, "Multiplication Level 1") },
-        {Difficulties.multLv2, new DifficultyInfo(40, "Multiplication Level 2") }, 
+        {Difficulties.multLv2, new DifficultyInfo(40, "Multiplication Level 2") },
         {Difficulties.multLv3, new DifficultyInfo(80, "Multiplication Level 3") },
         {Difficulties.multLv4, new DifficultyInfo(120, "Multiplication Level 4") },
 
         {Difficulties.divLv1, new DifficultyInfo(20, "Division Level 1") },
-        {Difficulties.divLv2, new DifficultyInfo(40, "Division Level 2") }, 
+        {Difficulties.divLv2, new DifficultyInfo(40, "Division Level 2") },
         {Difficulties.divLv3, new DifficultyInfo(80, "Division Level 3") },
         {Difficulties.divLv4, new DifficultyInfo(120, "Division Level 4") },
 
         {Difficulties.multDivLv1, new DifficultyInfo(20, "Multiplication & Division Level 1") },
-        {Difficulties.multDivLv2, new DifficultyInfo(40, "Multiplication & Division Level 2") }, 
+        {Difficulties.multDivLv2, new DifficultyInfo(40, "Multiplication & Division Level 2") },
         {Difficulties.multDivLv3, new DifficultyInfo(80, "Multiplication & Division Level 3") },
         {Difficulties.multDivLv4, new DifficultyInfo(120, "Multiplication & Division Level 4") },
 
         {Difficulties.addSubMultDivLv1, new DifficultyInfo(30, "Add, Subtract, Multiply & Divide Level 1") },
-        {Difficulties.addSubMultDivLv2, new DifficultyInfo(60, "Add & Subtract, Multiply & Divide Level 2") }, 
+        {Difficulties.addSubMultDivLv2, new DifficultyInfo(60, "Add & Subtract, Multiply & Divide Level 2") },
         {Difficulties.addSubMultDivLv3, new DifficultyInfo(120, "Add & Subtract, Multiply & Divide Level 3") },
         {Difficulties.addSubMultDivLv4, new DifficultyInfo(180, "Add & Subtract, Multiply & Divide Level 4") },
     };
@@ -143,5 +143,30 @@ public static class ModeData
             longName = _longName;
         }
     }
+
+    public enum StageScenes
+    {
+        SmallTown,
+        Beach,
+        City,
+        Desert,
+        Mountains,
+        Park,
+    }
+
+    public static Dictionary<StageScenes, string> stageNames = new()
+    {
+        { StageScenes.SmallTown, "SmallTown_Drive"},
+        { StageScenes.Beach, "Beach_Drive"},
+        { StageScenes.City, "City_Drive"},
+        };
+
+    public static List<StageScenes> sceneProgression = new()
+    {
+        StageScenes.SmallTown,
+        StageScenes.Beach,
+        StageScenes.City,
+     };
+
 }
 

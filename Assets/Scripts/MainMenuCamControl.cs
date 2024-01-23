@@ -51,33 +51,34 @@ public class MainMenuCamControl : MonoBehaviour
         lightSource.transform.rotation = newPosition.rotation;
     }
 
-    public void StartAtLevel(int level)
+    public void StartAtLevel(int levelNumber, ModeData.StageScenes scene)
     {
         const float setupTime = 1f;
         const float zoomTime = 1f;
-        float distanceToLevelViewPos = Vector3.Distance(transform.position, camPositions[level].transform.position);
+        float distanceToLevelViewPos = Vector3.Distance(transform.position, camPositions[levelNumber].transform.position);
 
         LeanTween.cancel(gameObject);
         if (distanceToLevelViewPos < 0.1f) // Skip setup if already at position
         {
             FadeToWhite(zoomTime);
-            ZoomAndGo();
+            ZoomAndGo(scene);
         }
         else
         {
-            LeanTween.rotate(gameObject, camPositions[level].transform.rotation.eulerAngles, setupTime).setEaseInOutCubic();
-            LeanTween.move(gameObject, camPositions[level], setupTime).setEaseInOutCubic().setOnComplete(() =>
+            LeanTween.rotate(gameObject, camPositions[levelNumber].transform.rotation.eulerAngles, setupTime).setEaseInOutCubic();
+            LeanTween.move(gameObject, camPositions[levelNumber], setupTime).setEaseInOutCubic().setOnComplete(() =>
             {
                 FadeToWhite(zoomTime);
-                ZoomAndGo();
+                ZoomAndGo(scene);
             });
         }
 
-        void ZoomAndGo()
+        void ZoomAndGo(ModeData.StageScenes sceneToLoad)
         {
-            LeanTween.rotate(gameObject, zoomedInPositions[level].transform.rotation.eulerAngles, zoomTime).setEaseInOutCubic();
-            LeanTween.move(gameObject, zoomedInPositions[level], zoomTime).setEaseInOutCubic().setOnComplete(() =>
-                SceneManager.LoadScene("EasyModeScene"));
+            string sceneString = ModeData.stageNames[sceneToLoad];
+            LeanTween.rotate(gameObject, zoomedInPositions[levelNumber].transform.rotation.eulerAngles, zoomTime).setEaseInOutCubic();
+            LeanTween.move(gameObject, zoomedInPositions[levelNumber], zoomTime).setEaseInOutCubic().setOnComplete(() =>
+                SceneManager.LoadScene(sceneString));
         }
     }
 
