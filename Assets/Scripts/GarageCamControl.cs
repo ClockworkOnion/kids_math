@@ -4,9 +4,9 @@ using UnityEngine;
 
 public class GarageCamControl : MonoBehaviour
 {
+    public float rotationSpeed = 10f;
     void Update()
     {
-        float rotationSpeed = 5f;
         transform.Rotate(new Vector3(0f, rotationSpeed, 0f) * Time.deltaTime);   
     }
 }
