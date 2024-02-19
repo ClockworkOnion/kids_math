@@ -115,7 +115,7 @@ public class MathManager
         leftDisplay = (correctAnswerLeft ? solution.ToString() : notASolution.ToString());
         rightDisplay = (correctAnswerLeft ? notASolution.ToString() : solution.ToString());
 
-        string centerDisplay = multiplicand1.ToString() + " * " + multiplicand2.ToString();
+        string centerDisplay = multiplicand1.ToString() + " × " + multiplicand2.ToString();
 
         int[] solutionPosition = new int[1];
         solutionPosition[0] = correctAnswerLeft ? 1 : 3;
@@ -157,7 +157,7 @@ public class MathManager
         leftDisplay = (correctAnswerLeft ? dividend1.ToString() : notASolution.ToString());
         rightDisplay = (correctAnswerLeft ? notASolution.ToString() : dividend1.ToString());
 
-        string centerDisplay = solution.ToString() + " / " + dividend2.ToString();
+        string centerDisplay = solution.ToString() + " ÷ " + dividend2.ToString();
 
         int[] solutionPosition = new int[1];
         solutionPosition[0] = correctAnswerLeft ? 1 : 3;

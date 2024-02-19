@@ -6,6 +6,7 @@ public class RoadSideObject : MonoBehaviour
 {
     StageManager stageManager;
     bool isMoving = true;
+    public bool popUp = false;
 
     private void Start()
     {
@@ -14,11 +15,13 @@ public class RoadSideObject : MonoBehaviour
         stageManager.stageEnd.AddListener(OnStageEnd);
     }
 
-    public void OnStageStart() {
+    public void OnStageStart()
+    {
         isMoving = true;
     }
 
-    public void OnStageEnd() {
+    public void OnStageEnd()
+    {
         isMoving = false;
     }
 
@@ -28,7 +31,8 @@ public class RoadSideObject : MonoBehaviour
             MoveObject();
     }
 
-    private void MoveObject() { 
+    private void MoveObject()
+    {
         float speed = stageManager.getDriveSpeed();
         const float FACTOR = 10;
         Vector3 worldForward = new(0, 0, -1);
@@ -36,7 +40,15 @@ public class RoadSideObject : MonoBehaviour
         transform.position += movement * worldForward;
 
         // Jump back
-        if (transform.position.z <= -20) 
-	        transform.position += new Vector3(0, 0, 200);
+        if (transform.position.z <= -20)
+        {
+            transform.position += new Vector3(0, 0, 200);
+
+            if (popUp)
+            {
+                transform.localScale = new Vector3(0.1f, 0.1f, 0.1f);
+                LeanTween.scale(gameObject, new Vector3(1f, 1f, 1f), .5f).setEaseOutElastic();
+            }
+        }
     }
 }
