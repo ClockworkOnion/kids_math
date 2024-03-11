@@ -80,6 +80,7 @@ public class StageManager : MonoBehaviour
         // Set up selected material on player car
         Material currentMat = GameManager.GetInstance().carMaterial;
         fireworks.ForEach((fw) => fw.Stop());
+        LeanTween.delayedCall(.1f, stageStart.Invoke);
     }
 
     void Update()
@@ -354,7 +355,7 @@ public class StageManager : MonoBehaviour
     {
         addLv1, addLv2, addLv3, addLv4, addLv5,
         subLv1, subLv2, subLv3, subLv4,
-        addSubLv1, addSubLv2, addSubLv3, addSubLv4,
+        addSubLv1, addSubLv2, addSubLv3,addSubLv4,
 
         multLv1, multLv2, multLv3, multLv4,
         divLv1, divLv2, divLv3, divLv4,

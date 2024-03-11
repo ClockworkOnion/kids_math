@@ -22,12 +22,12 @@ public class MainMenuCamControl : MonoBehaviour
     public void SelectLevel(int level)
     {
         Debug.Log("Selecting Lv " + level);
-        TweenCameraTo(camPositions[level - 1]);
+        TweenCameraTo(camPositions[(level - 1) % camPositions.Length] );
     }
 
     public void ZoomOutFrom(int zoomPosition)
     {
-        SetCameraTo(zoomedInPositions[zoomPosition]);
+        SetCameraTo(zoomedInPositions[zoomPosition % zoomedInPositions.Length]);
         SelectLevel(zoomPosition + 1);
     }
 

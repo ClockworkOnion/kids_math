@@ -17,4 +17,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/SmallTown_Drive.unity
     guid: 12129abe82fc7428f8f993f2adad57b2
+  - enabled: 1
+    path: Assets/Scenes/Desert_Drive.unity
+    guid: 34691926baee441b68b310a2255ae0be
   m_configObjects: {}

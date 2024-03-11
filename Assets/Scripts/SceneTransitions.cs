@@ -13,7 +13,6 @@ public class SceneTransitions : MonoBehaviour
     public void OnSceneLoaded(Scene scene, LoadSceneMode sceneMode)
     {
         Debug.Log("Loaded scene: " + scene.name);
-        lastLoaded = scene;
         switch (scene.name)
         {
             case "MainMenuScene":
@@ -22,6 +21,7 @@ public class SceneTransitions : MonoBehaviour
             default:
                 break;
         }
+        lastLoaded = scene;
     }
 
     public void MenuSceneConstructor()
@@ -30,7 +30,7 @@ public class SceneTransitions : MonoBehaviour
         MainMenuCamControl camControl = Camera.main.GetComponent<MainMenuCamControl>();
 
         Debug.Log("stageProgression: " + PlayerPrefs.GetInt("stageProgression"));
-        camControl.ZoomOutFrom(PlayerPrefs.GetInt("stageProgression"));
+        camControl.ZoomOutFrom(PlayerPrefs.GetInt("stageProgression") - 1); // Zoom out from previous stage
 
         CanvasGroup whiteFader = GameObject.Find("WhiteFade").GetComponent<CanvasGroup>();
         if (lastLoaded != null)

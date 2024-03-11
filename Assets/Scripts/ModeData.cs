@@ -159,6 +159,7 @@ public static class ModeData
         { StageScenes.SmallTown, "SmallTown_Drive"},
         { StageScenes.Beach, "Beach_Drive"},
         { StageScenes.City, "City_Drive"},
+        { StageScenes.Desert, "Desert_Drive"},
         };
 
     public static List<StageScenes> sceneProgression = new()
@@ -166,6 +167,7 @@ public static class ModeData
         StageScenes.SmallTown,
         StageScenes.Beach,
         StageScenes.City,
+        StageScenes.Desert,
      };
 
 }
