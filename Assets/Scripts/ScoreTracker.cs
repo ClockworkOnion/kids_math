@@ -165,7 +165,7 @@ public class ScoreTracker : MonoBehaviour
     public void ShowScores(int coinsEarned)
     {
         stageSummary.Show();
-        stageSummary.ShowScores(problemsSolved, problemsTotal - problemsSolved, -1);
+        stageSummary.ShowScores(problemsSolved, problemsTotal - problemsSolved, coinsEarned);
 
         /*
         float ratio = GetRatio();

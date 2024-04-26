@@ -23,6 +23,11 @@ public class DaytimeSwitch : MonoBehaviour
     {
         stageLight = GetComponent<Light>();
         mainCam = Camera.main;
+        int progression = PlayerPrefs.GetInt("stageProgression");
+        int sceneCount = ModeData.sceneProgression.Count;
+        int loopNumber = Mathf.CeilToInt(progression / sceneCount);
+        if (!isEven(loopNumber))
+            ToNightTime();
     }
 
     // Update is called once per frame
@@ -37,19 +42,23 @@ public class DaytimeSwitch : MonoBehaviour
         }
     }
 
-        private void ToNightTime()
-        {
-            isNightTime = true;
-            mainCam.backgroundColor = cameraNightBG;
-            stageLight.color = nightLine;
-            stageLight.transform.rotation = Quaternion.Euler(eveningRotation);
-        }
-
-        private void ToDayTime()
-        {
-            isNightTime = false;
-            mainCam.backgroundColor = cameraDayBG;
-            stageLight.color = dayLine;
-            stageLight.transform.rotation = Quaternion.Euler(eveningRotation);
-        }
+    private bool isEven(int number) {
+        return (number % 2 == 0); 
     }
+
+    private void ToNightTime()
+    {
+        isNightTime = true;
+        mainCam.backgroundColor = cameraNightBG;
+        stageLight.color = nightLine;
+        stageLight.transform.rotation = Quaternion.Euler(eveningRotation);
+    }
+
+    private void ToDayTime()
+    {
+        isNightTime = false;
+        mainCam.backgroundColor = cameraDayBG;
+        stageLight.color = dayLine;
+        stageLight.transform.rotation = Quaternion.Euler(eveningRotation);
+    }
+}

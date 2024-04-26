@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using UnityEngine.Events;
+using TMPro;
 
 public class StageManager : MonoBehaviour
 {
@@ -35,6 +36,8 @@ public class StageManager : MonoBehaviour
 
     [SerializeField] private float STAGE_TIME_TOTAL = 15f;
     [SerializeField] private float BASE_DRIVE_SPEED = 1f; // Reset drive speed to this value after a round
+    private readonly int SCORE_TO_ADVANCE = 10;
+    private PrettyButton okButton;
 
     private int highScore = 0;
     private int playerScore = 0;
@@ -68,6 +71,7 @@ public class StageManager : MonoBehaviour
         touchControlHints = GameObject.Find("TouchControlHints");
         touchControlPanel = GameObject.Find("TouchControlPanel").GetComponent<TouchControlPanel>();
         uiDisplay = GameObject.Find("TextDisplayManager").GetComponent<TextDisplayManager>();
+        okButton = GameObject.Find("OKButton").GetComponent<PrettyButton>();
 
         playState = State.countdown;
         highScore = PlayerPrefs.GetInt("Highscore", 0);
@@ -149,6 +153,24 @@ public class StageManager : MonoBehaviour
         countDownTimerLeft = 3f;
 
         scoreTracker.ShowScores(playerScore);
+
+        // Prepare End-round button
+        bool roundCleared = scoreTracker.GetSolved() > SCORE_TO_ADVANCE ? true : false;
+        string buttonText = roundCleared ? "Next!" : "Repeat";
+        okButton.GetComponentInChildren<TextMeshProUGUI>().SetText(buttonText);
+        okButton.onClick.RemoveAllListeners();
+
+        if (roundCleared)
+        {
+            okButton.onClick.AddListener(FadeToMenu);
+            int currentProgression = PlayerPrefs.GetInt("stageProgression");
+            PlayerPrefs.SetInt("stageProgression", currentProgression + 1);
+        }
+        else
+        {
+            okButton.onClick.AddListener(RepeatStage);
+        }
+
         GameManager.GetInstance().AddPlayerMoney(playerScore);
 
         FadeProgressBars(fadeTime: 1, onOrOff: false);
@@ -244,9 +266,6 @@ public class StageManager : MonoBehaviour
 
     public void FadeToMenu()
     {
-        // Increase stage counter (this should be done elsewhere...)
-        int currentProgression = PlayerPrefs.GetInt("stageProgression");
-        PlayerPrefs.SetInt("stageProgression", currentProgression + 1);
 
         zoomOut.Invoke();
         float fadeTime = 1f;
@@ -341,7 +360,7 @@ public class StageManager : MonoBehaviour
             currentLane = playerInput;
             float targetXPosition = (playerInput == 1 ? -2f : playerInput == 2 ? 0f : 2f);
             LeanTween.cancel(playerCar.gameObject);
-            LeanTween.move(playerCar.gameObject, new Vector3(targetXPosition, 0, 0), 1)
+            LeanTween.move(playerCar.gameObject, new Vector3(targetXPosition, 0, 0), .2f)
                 .setEaseInOutCubic();
         }
     }
@@ -355,7 +374,7 @@ public class StageManager : MonoBehaviour
     {
         addLv1, addLv2, addLv3, addLv4, addLv5,
         subLv1, subLv2, subLv3, subLv4,
-        addSubLv1, addSubLv2, addSubLv3,addSubLv4,
+        addSubLv1, addSubLv2, addSubLv3, addSubLv4,
 
         multLv1, multLv2, multLv3, multLv4,
         divLv1, divLv2, divLv3, divLv4,

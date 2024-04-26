@@ -54,6 +54,7 @@ public class GameManager : MonoBehaviour
         if (Input.GetKey(KeyCode.R) && Input.GetKey(KeyCode.P))
         {
             PlayerPrefs.SetInt("stageProgression", 0);
+            Debug.Log("Resetting stage progression...");
         }
 
         if (Input.GetKey(KeyCode.P) && Input.GetKey(KeyCode.Alpha1))

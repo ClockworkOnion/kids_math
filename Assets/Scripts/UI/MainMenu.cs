@@ -32,7 +32,6 @@ public class MainMenu : MonoBehaviour
     private void Start()
     {
         mainCamera = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<Camera>();
-        //CameraWobbleUp();
     }
 
     void Update()
